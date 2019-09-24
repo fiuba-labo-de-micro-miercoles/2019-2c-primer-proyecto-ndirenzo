@@ -1,0 +1,44 @@
+#include "m2560def.inc" 
+
+	.cseg
+	
+
+	LDI R16, 0xFF ; R16 en 1
+	OUT DDRB, R16 ; PUERTOB como salida
+	LDI R17, $1
+	LDI R22, $FF 
+	LDI R24, $1   ; Contador que va cambiando la duracion del delay
+
+START:	
+	SBI PORTB,7	
+	INC R24
+	ADD R17,R24   ; Aumento en 1 la duracion del tiempo prendido
+	SBC R22,R24	  ; Disminuyo en 1 la duracion del tiempo apagado
+	LDI R18, $FF 
+	LDI R20, $1 
+	LDI R21, $1 
+	LDI R23, $FF
+
+MAIN_LOOP_OFF: 
+	ADD R20, R21
+	DEC R17
+	BRNE loop
+	CBI PORTB,7 
+	JMP MAIN_LOOP_ON
+
+LOOP:
+	ADD R20, R21
+	DEC R18 
+	BRNE LOOP
+	JMP MAIN_LOOP_OFF
+
+MAIN_LOOP_ON: 
+	ADD R20, R21
+	DEC R22
+	BRNE LOOP2
+	JMP START    ; Vuelvo a arrancar el ciclo completo  
+LOOP2:
+	ADD R20, R21
+	DEC R23 
+	BRNE LOOP2
+	JMP MAIN_LOOP_ON
